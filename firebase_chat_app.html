@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Eestec Coding Night</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb"
+        crossorigin="anonymous">
+    <link rel="stylesheet" href="styles.css" type="text/css">
+
+</head>
+
+<body>
+    <div class="container">
+        <div class="form-group">
+            <label for="user">Kullanıcı Adı</label>
+            <input type="text" class="form-control" id="user">
+        </div>
+        <div class="form-group">
+            <label for="message">Mesaj</label>
+            <textarea class="form-control" id="message" rows="3"></textarea>
+        </div>
+        <button onclick="gonder()" class="btn btn-primary">Submit</button>
+    </div>
+    <div class="container-fluid" style="margin-top: 30px;">
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ"
+        crossorigin="anonymous"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.6.2/firebase.js"></script>
+    <script>
+        // Initialize Firebase
+        var config = {
+            apiKey: "AIzaSyANrxwf_GwsW0D5MjvjgSNzto_g78lGo2w",
+            authDomain: "eestec-chatters.firebaseapp.com",
+            databaseURL: "https://eestec-chatters.firebaseio.com",
+            projectId: "eestec-chatters",
+            storageBucket: "eestec-chatters.appspot.com",
+            messagingSenderId: "859069841331"
+        };
+        var defaultApp = firebase.initializeApp(config);
+        var defaultDatabase = defaultApp.database();
+        var standardRef = defaultDatabase.ref("/mesajlar");
+        standardRef.on('value', function (dataSnapshot) {
+            var mesajArray = Object.keys(dataSnapshot.val());
+            var mesajSayisi = mesajArray.length;
+            var myNode = document.getElementsByClassName("container-fluid")[0];
+            while (myNode.firstChild) {
+                myNode.removeChild(myNode.firstChild);
+            }
+            for (i = 0; i < mesajSayisi; i++) {
+                var gidilecekNokta = mesajArray[i];
+                var mesaj = dataSnapshot.child(gidilecekNokta).val().message;
+                var kullanici = dataSnapshot.child(gidilecekNokta).val().user;
+                var container = document.getElementsByClassName('container-fluid');
+                var card = document.createElement('div');
+                card.className = "card";
+                container[0].appendChild(card);
+                var cardBody = document.createElement('div');
+                cardBody.className = "card-body";
+                cardBody.textContent = kullanici + ": " + mesaj;
+                card.appendChild(cardBody);
+            }
+
+        });
+        function gonder() {
+            var userNode = document.getElementById("user");
+            var user = userNode.value;
+            var messageNode = document.getElementById("message");
+            var message = messageNode.value;
+            console.log("göndere basıldı");
+            standardRef.push({
+                user: user,
+                message: message
+            });
+            
+        }
+    </script>
+
+</body>
+
+</html>
